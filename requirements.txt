@@ -1,0 +1,4 @@
+discord.py
+python-dotenv
+discord-ext-bot
+pysqlite3
