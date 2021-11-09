@@ -15,27 +15,6 @@ from email.mime.multipart import MIMEMultipart
 
 
 ###############################################################################
-# Get the Discord token and Gmail password from the .env file so pica can login
-###############################################################################
-token_values = dotenv_values(".env")
-TOKEN = token_values['PICA_TOKEN']
-GMAIL_PASSWORD = token_values['GMAIL_PASSWORD']
-
-
-###############################################################################
-# Setup the users database
-###############################################################################
-conn = sqlite3.connect('magpies.db')
-c = conn.cursor()
-c.execute("""CREATE TABLE IF NOT EXISTS users(
-   userid INT,
-   email TEXT,
-   code INT,
-   verified INT);
-""")
-
-
-###############################################################################
 # SQL queries 
 ###############################################################################
 """ check to see if user exists in the database """
@@ -99,6 +78,27 @@ def check_if_email(userID):
 
 
 ###############################################################################
+# Get the Discord token and Gmail password from the .env file so pica can login
+###############################################################################
+token_values = dotenv_values(".env")
+TOKEN = token_values['PICA_TOKEN']
+GMAIL_PASSWORD = token_values['GMAIL_PASSWORD']
+GUILD_ID = token_values['GUILD_ID']
+
+
+###############################################################################
+# Setup the users database
+###############################################################################
+conn = sqlite3.connect('magpies.db')
+c = conn.cursor()
+c.execute("""CREATE TABLE IF NOT EXISTS users(
+   userid INT,
+   email TEXT,
+   code INT,
+   verified INT);
+""")
+
+###############################################################################
 # Log in the bot and start it up!
 ###############################################################################
 intents = discord.Intents.default()
@@ -112,7 +112,7 @@ bot = commands.Bot(command_prefix="P;!", intents=intents, help_command=None)
 @bot.event
 async def on_ready():
     print('pica has connected to Discord')
-    await bot.change_presence(activity=discord.Game("P;!help"))
+    await bot.change_presence(activity=discord.Game("https://github.com/jgpstuart/pica-bot"))
 
 
 ###############################################################################
@@ -198,7 +198,7 @@ async def on_message(message):
                 # check the verification code in the database against the message they sent
                 if verification_code == int(message_content):
                     # assign them the magpie role
-                    server = bot.get_guild(905274839860924467)
+                    server = bot.get_guild(int(GUILD_ID))
                     role = discord.utils.get(server.roles, name="magpie")
                     member = server.get_member(message.author.id)
                     await member.add_roles(role)
