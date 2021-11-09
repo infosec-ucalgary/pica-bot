@@ -76,11 +76,15 @@ def check_if_email(userID):
     else:
         return True
 
+""" get the absolute path for a file """
+def abs_path(path):
+    return os.path.abspath(path)
+
 
 ###############################################################################
 # Get the Discord token and Gmail password from the .env file so pica can login
 ###############################################################################
-token_values = dotenv_values(".env")
+token_values = dotenv_values(abs_path(".env"))
 TOKEN = token_values['PICA_TOKEN']
 GMAIL_PASSWORD = token_values['GMAIL_PASSWORD']
 GUILD_ID = token_values['GUILD_ID']
@@ -89,7 +93,7 @@ GUILD_ID = token_values['GUILD_ID']
 ###############################################################################
 # Setup the users database
 ###############################################################################
-conn = sqlite3.connect('magpies.db')
+conn = sqlite3.connect(abs_path("magpies.db"))
 c = conn.cursor()
 c.execute("""CREATE TABLE IF NOT EXISTS users(
    userid INT,
@@ -202,6 +206,12 @@ async def on_message(message):
                     role = discord.utils.get(server.roles, name="magpie")
                     member = server.get_member(message.author.id)
                     await member.add_roles(role)
+                    # announce that they're in to the server!
+                    channel = discord.utils.get(server.text_channels, name='general')
+                    if channel is not None:
+                        new_user = message.author
+                        await channel.send(f"A new magpie has landed!  Everyone welcome {new_user}!!!\n" \
+                                            "https://c.tenor.com/EdyX5M8Vi7wAAAAC/magpie.gif")
                     # add them as verified in the database
                     verify_user(message.author.id)
                     await message.channel.send("Verification code match!  Welcome to Manzara's Magpies!")
@@ -210,6 +220,7 @@ async def on_message(message):
             else:
                 await message.channel.send("You have already been verified.  Cut it out!")
     await bot.process_commands(message)
+
 
 ###############################################################################
 # Help message for interacting with pica
@@ -252,6 +263,9 @@ async def addrole(ctx, *, role=''):
             elif "networks" in role.lower():
                 await ctx.author.add_roles(discord.utils.get(ctx.author.guild.roles, name="Networks"))
                 await ctx.send("You have been given the Networks role.")
+            elif "OSINT" in role.lower():
+                await ctx.author.add_roles(discord.utils.get(ctx.author.guild.roles, name="OSINT"))
+                await ctx.send("You have been given the OSINT role.")
             else:
                 response = "Please use this command followed immediately by a desired role selected from cryptography, forensics, binary exploitation, web exploitation," \
                            " or reverse engineering.\nExample usage:    P;!addrole binary exploitation"
