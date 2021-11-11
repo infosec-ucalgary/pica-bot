@@ -1,6 +1,5 @@
 # bot.py
 import os
-
 import discord
 from discord import message
 from dotenv import dotenv_values
@@ -202,6 +201,12 @@ async def on_message(message):
                     role = discord.utils.get(server.roles, name="magpie")
                     member = server.get_member(message.author.id)
                     await member.add_roles(role)
+                    # announce that they're in to the server!
+                    channel = discord.utils.get(server.text_channels, name='general')
+                    if channel is not None:
+                        new_user = message.author
+                        await channel.send(f"A new magpie has landed!  Everyone welcome {new_user}!!!\n" \
+                                            "https://c.tenor.com/EdyX5M8Vi7wAAAAC/magpie.gif")
                     # add them as verified in the database
                     verify_user(message.author.id)
                     await message.channel.send("Verification code match!  Welcome to Manzara's Magpies!")
@@ -252,6 +257,9 @@ async def addrole(ctx, *, role=''):
             elif "networks" in role.lower():
                 await ctx.author.add_roles(discord.utils.get(ctx.author.guild.roles, name="Networks"))
                 await ctx.send("You have been given the Networks role.")
+            elif "OSINT" in role:
+                await ctx.author.add_roles(discord.utils.get(ctx.author.guild.roles, name="OSINT"))
+                await ctx.send("You have been given the OSINT role.")
             else:
                 response = "Please use this command followed immediately by a desired role selected from cryptography, forensics, binary exploitation, web exploitation," \
                            " or reverse engineering.\nExample usage:    P;!addrole binary exploitation"
