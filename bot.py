@@ -75,11 +75,15 @@ def check_if_email(userID):
     else:
         return True
 
+""" get the absolute path for a file """
+def abs_path(path):
+    return os.path.abspath(path)
+
 
 ###############################################################################
 # Get the Discord token and Gmail password from the .env file so pica can login
 ###############################################################################
-token_values = dotenv_values(".env")
+token_values = dotenv_values(abs_path(".env"))
 TOKEN = token_values['PICA_TOKEN']
 GMAIL_PASSWORD = token_values['GMAIL_PASSWORD']
 GUILD_ID = token_values['GUILD_ID']
@@ -88,7 +92,7 @@ GUILD_ID = token_values['GUILD_ID']
 ###############################################################################
 # Setup the users database
 ###############################################################################
-conn = sqlite3.connect('magpies.db')
+conn = sqlite3.connect(abs_path("magpies.db"))
 c = conn.cursor()
 c.execute("""CREATE TABLE IF NOT EXISTS users(
    userid INT,
@@ -216,6 +220,7 @@ async def on_message(message):
                 await message.channel.send("You have already been verified.  Cut it out!")
     await bot.process_commands(message)
 
+
 ###############################################################################
 # Help message for interacting with pica
 ###############################################################################
@@ -257,7 +262,11 @@ async def addrole(ctx, *, role=''):
             elif "networks" in role.lower():
                 await ctx.author.add_roles(discord.utils.get(ctx.author.guild.roles, name="Networks"))
                 await ctx.send("You have been given the Networks role.")
+<<<<<<< HEAD
             elif "OSINT" in role:
+=======
+            elif "OSINT" in role.lower():
+>>>>>>> 4d8fb3f8bdb079bf3d930a04763a953d1b29cdc1
                 await ctx.author.add_roles(discord.utils.get(ctx.author.guild.roles, name="OSINT"))
                 await ctx.send("You have been given the OSINT role.")
             else:
