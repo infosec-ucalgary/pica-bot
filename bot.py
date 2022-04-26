@@ -267,7 +267,7 @@ async def addrole(ctx, *, role=''):
                 await ctx.send("You have been given the OSINT role.")
             else:
                 response = "Please use this command followed immediately by a desired role selected from cryptography, forensics, binary exploitation, web exploitation," \
-                           " or reverse engineering.\nExample usage:    P;!addrole binary exploitation"
+                           "osint, or reverse engineering.\nExample usage:    P;!addrole binary exploitation"
                 await ctx.send(response)
         except:
             await ctx.send("There was an error using this command. Make sure you are using it in an appropriate server.")
