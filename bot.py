@@ -262,11 +262,7 @@ async def addrole(ctx, *, role=''):
             elif "networks" in role.lower():
                 await ctx.author.add_roles(discord.utils.get(ctx.author.guild.roles, name="Networks"))
                 await ctx.send("You have been given the Networks role.")
-<<<<<<< HEAD
-            elif "OSINT" in role:
-=======
             elif "OSINT" in role.lower():
->>>>>>> 4d8fb3f8bdb079bf3d930a04763a953d1b29cdc1
                 await ctx.author.add_roles(discord.utils.get(ctx.author.guild.roles, name="OSINT"))
                 await ctx.send("You have been given the OSINT role.")
             else:
