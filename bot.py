@@ -262,12 +262,12 @@ async def addrole(ctx, *, role=''):
             elif "networks" in role.lower():
                 await ctx.author.add_roles(discord.utils.get(ctx.author.guild.roles, name="Networks"))
                 await ctx.send("You have been given the Networks role.")
-            elif "OSINT" in role.lower():
+            elif "osint" in role.lower():
                 await ctx.author.add_roles(discord.utils.get(ctx.author.guild.roles, name="OSINT"))
                 await ctx.send("You have been given the OSINT role.")
             else:
                 response = "Please use this command followed immediately by a desired role selected from cryptography, forensics, binary exploitation, web exploitation," \
-                           " or reverse engineering.\nExample usage:    P;!addrole binary exploitation"
+                           "osint, or reverse engineering.\nExample usage:    P;!addrole binary exploitation"
                 await ctx.send(response)
         except:
             await ctx.send("There was an error using this command. Make sure you are using it in an appropriate server.")
