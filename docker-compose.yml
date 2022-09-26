@@ -1,0 +1,9 @@
+services:
+  pica-bot:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - "443:443"
+      - "80:80"
+    restart: unless-stopped
