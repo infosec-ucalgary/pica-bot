@@ -104,8 +104,9 @@ c.execute("""CREATE TABLE IF NOT EXISTS users(
 ###############################################################################
 # Log in the bot and start it up!
 ###############################################################################
-intents = discord.Intents.default()
-intents.members = True
+intents = discord.Intents.all()
+# intents.members = True
+# intents.message_content = True
 bot = commands.Bot(command_prefix="P;!", intents=intents, help_command=None)
 
 
