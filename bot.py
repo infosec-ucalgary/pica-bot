@@ -175,7 +175,7 @@ async def on_message(message):
                     # Create a secure SSL context for the gmail account to send the email
                     context = ssl.create_default_context()
                     # send the verification email from the gmail account
-                    with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
+                    with smtplib.SMTP_SSL("smtp.gmail.com", port=port, context=context) as server:
                         server.login("manzarasmagpies@gmail.com", GMAIL_PASSWORD)
                         server.sendmail("manzarasmagpies@gmail.com", message_content, email_message.as_string())
                     await message.channel.send("A verification code has been emailed to you.  **Please reply to me with the " \
