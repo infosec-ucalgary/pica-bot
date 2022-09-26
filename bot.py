@@ -209,8 +209,10 @@ async def on_message(message):
                     channel = discord.utils.get(server.text_channels, name='general')
                     if channel is not None:
                         new_user = message.author
-                        await channel.send(f"A new magpie has landed!  Everyone welcome {new_user}!!!\n" \
-                                            "https://c.tenor.com/EdyX5M8Vi7wAAAAC/magpie.gif")
+                        await channel.send(f"""
+A new magpie has landed!  Everyone welcome {new_user}!!!
+https://c.tenor.com/EdyX5M8Vi7wAAAAC/magpie.gif
+""")
                     # add them as verified in the database
                     verify_user(message.author.id)
                     await message.channel.send("Verification code match!  Welcome to Manzara's Magpies!")
