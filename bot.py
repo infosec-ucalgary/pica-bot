@@ -115,7 +115,7 @@ bot = commands.Bot(command_prefix="P;!", intents=intents, help_command=None)
 @bot.event
 async def on_ready():
     print('pica has connected to Discord')
-    await bot.change_presence(activity=discord.Game("https://github.com/jgpstuart/pica-bot"))
+    await bot.change_presence(activity=discord.Game("https://github.com/infosec-ucalgary/pica-bot"))
 
 
 ###############################################################################
