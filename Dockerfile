@@ -5,7 +5,6 @@ RUN apk add --update python3 py3-pip sqlite &&\
     mkdir -p /home/app
 
 COPY bot.py /home/app/
-COPY magpies.db /home/app/
 COPY requirements.txt /home/app/
 COPY .env /home/app/
 
