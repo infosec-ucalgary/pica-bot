@@ -67,7 +67,7 @@ def check_if_verified(userID):
         return True
 
 """ check if user has been sent a verification code """
-def check_if_email(userID):
+def pending_verification(userID):
     record = check_user(userID)
     email = record[1]
     if email == None:
@@ -159,28 +159,7 @@ async def on_message(message):
             if not check_if_verified(message.author.id):
                 # If it is a valid @magpie.com email address:
                 if "@magpie.com" in message_content:
-                    # generate verification code
-                    verification_code = random.randint(100000, 999999)
-                    # add their email address and verification code to the database
-                    update_email(message.author.id, message_content)
-                    update_code(message.author.id, verification_code)
-                    # setup the email message to send them
-                    port = 465
-                    email_message = MIMEMultipart("alternative")
-                    email_message["Subject"] = "Manzara's Magpies Verification Code"
-                    email_message["From"] = "manzarasmagpies@gmail.com"
-                    email_message["To"] = message_content
-                    text = str(verification_code)
-                    compiled = MIMEText(text, "plain")
-                    email_message.attach(compiled)
-                    # Create a secure SSL context for the gmail account to send the email
-                    context = ssl.create_default_context()
-                    # send the verification email from the gmail account
-                    with smtplib.SMTP_SSL("smtp.gmail.com", port=port, context=context) as server:
-                        server.login("manzarasmagpies@gmail.com", GMAIL_PASSWORD)
-                        server.sendmail("manzarasmagpies@gmail.com", message_content, email_message.as_string())
-                    await message.channel.send("A verification code has been emailed to you.  **Please reply to me with the " \
-                                    "verficiation code to be added to the Manzara's Magpies server.** If you haven't received it, check your spam folder.")
+                    await send_verification_code(message, message_content)
                 else:
                     await message.channel.send("That is not a valid email address.  If you do not yet have a valid @magpie.com " \
                                                "email address, please contact The University of Calgary Bureaucracy Club.")
@@ -190,39 +169,73 @@ async def on_message(message):
         # check if this is a verification code
         elif (len(message_content) == 6) and message_content.isdigit():
             # check if they've submitted a valid @magpie.com email address yet
-            if not check_if_email(message.author.id):
+            if not pending_verification(message.author.id):
                 await message.channel.send("You have not submitted a valid @magpie.com email address yet. " \
                                            "You must submit a valid email address before you can submit a " \
                                            "verification code.")
             # check if they're verified, and if not check their verification code
             elif not check_if_verified(message.author.id):
-                # get their verification code from the database
-                user_records = check_user(message.author.id)
-                verification_code = user_records[2]
-                # check the verification code in the database against the message they sent
-                if verification_code == int(message_content):
-                    # assign them the magpie role
-                    server = bot.get_guild(int(GUILD_ID))
-                    role = discord.utils.get(server.roles, name="magpie")
-                    member = server.get_member(message.author.id)
-                    await member.add_roles(role)
-                    # announce that they're in to the server!
-                    channel = discord.utils.get(server.text_channels, name='general')
-                    if channel is not None:
-                        new_user = message.author
-                        await channel.send(f"""
-A new magpie has landed!  Everyone welcome {new_user}!!!
-https://c.tenor.com/EdyX5M8Vi7wAAAAC/magpie.gif
-""")
-                    # add them as verified in the database
-                    verify_user(message.author.id)
-                    await message.channel.send("Verification code match!  Welcome to Manzara's Magpies!")
-                else:
-                    await message.channel.send("Verification code does not match.")
+                await check_verification_code(message, message_content)
             else:
                 await message.channel.send("You have already been verified.  Cut it out!")
     await bot.process_commands(message)
 
+###############################################################################
+# Send the user a verification code to their magpie email address :)
+###############################################################################
+async def send_verification_code(message, message_content):
+    # generate verification code
+    verification_code = random.randint(100000, 999999)
+    # add their email address and verification code to the database
+    update_email(message.author.id, message_content)
+    update_code(message.author.id, verification_code)
+    # setup the email message to send them
+    port = 465
+    email_message = MIMEMultipart("alternative")
+    email_message["Subject"] = "Manzara's Magpies Verification Code"
+    email_message["From"] = "manzarasmagpies@gmail.com"
+    email_message["To"] = message_content
+    text = str(verification_code)
+    compiled = MIMEText(text, "plain")
+    email_message.attach(compiled)
+    # Create a secure SSL context for the gmail account to send the email
+    context = ssl.create_default_context()
+    # send the verification email from the gmail account
+    with smtplib.SMTP_SSL("smtp.gmail.com", port=port, context=context) as server:
+        server.login("manzarasmagpies@gmail.com", GMAIL_PASSWORD)
+        server.sendmail("manzarasmagpies@gmail.com", message_content, email_message.as_string())
+    await message.channel.send("A verification code has been emailed to you.  **Please reply to me with the " \
+                    "verficiation code to be added to the Manzara's Magpies server.** If you haven't received it, check your spam folder.")
+
+###############################################################################
+# Check verification code
+###############################################################################
+async def check_verification_code(message, message_content):
+    # get their verification code from the database
+    user_records = check_user(message.author.id)
+    verification_code = user_records[2]
+    # check the verification code in the database against the message they sent
+    if verification_code != int(message_content):
+        await message.channel.send("Verification code does not match.")
+        return
+
+    # assign them the magpie role
+    server = bot.get_guild(int(GUILD_ID))
+    role = discord.utils.get(server.roles, name="magpie")
+    member = server.get_member(message.author.id)
+    await member.add_roles(role)
+
+    # announce that they're in to the server!
+    channel = discord.utils.get(server.text_channels, name='general')
+    if channel is not None:
+        new_user = message.author
+        await channel.send(f"""
+A new magpie has landed!  Everyone welcome {new_user}!!!
+https://c.tenor.com/EdyX5M8Vi7wAAAAC/magpie.gif
+""")
+    # add them as verified in the database
+    verify_user(message.author.id)
+    await message.channel.send("Verification code match!  Welcome to Manzara's Magpies!")
 
 ###############################################################################
 # Help message for interacting with pica
