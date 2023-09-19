@@ -1,6 +1,11 @@
 FROM alpine
 
-RUN apk add --update python3 py3-pip sqlite &&\
+RUN apk add --update python3 \
+      py3-pip \
+      alpine-sdk \
+      python3-dev \
+      sqlite-dev \
+      sqlite &&\
     adduser -h /home/app app --disabled-password &&\
     mkdir -p /home/app
 
